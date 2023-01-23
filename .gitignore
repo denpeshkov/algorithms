@@ -1,0 +1,20 @@
+### JetBrains template
+
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+.idea_modules/
+
+### Go template
+
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+testdata/
