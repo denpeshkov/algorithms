@@ -1,7 +1,7 @@
 package numeric_test
 
 import (
-	. "github.com/denpeshkov/algorithms/numeric"
+	"github.com/denpeshkov/algorithms/numeric"
 
 	"math/big"
 	"testing"
@@ -28,7 +28,7 @@ func TestFastExp(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		got := FastExp(tt.a, tt.n)
+		got := numeric.FastExp(tt.a, tt.n)
 		want, _ := new(big.Int).SetString(tt.want, 0)
 
 		if got.Cmp(want) != 0 {
