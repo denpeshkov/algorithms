@@ -1,10 +1,10 @@
 package numeric_test
 
 import (
-	"github.com/denpeshkov/algorithms/numeric"
-
 	"math/big"
 	"testing"
+
+	"github.com/denpeshkov/algorithms/numeric"
 )
 
 func TestFastExp(t *testing.T) {
