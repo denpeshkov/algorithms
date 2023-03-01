@@ -1,10 +1,10 @@
 module github.com/denpeshkov/algorithms
 
-go 1.19
+go 1.20
 
 require (
-	github.com/stretchr/testify v1.8.1
-	golang.org/x/exp v0.0.0-20230129154200-a960b3787bd2
+	github.com/stretchr/testify v1.8.2
+	golang.org/x/exp v0.0.0-20230224173230-c95f2b4c22f2
 )
 
 require (
