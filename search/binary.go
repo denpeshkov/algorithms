@@ -1,6 +1,6 @@
 package search
 
-import "golang.org/x/exp/constraints"
+import "cmp"
 
 /*
 Binary implements binary search.
@@ -8,7 +8,7 @@ Searches for target in a sorted slice and returns the position where target is f
 or the position where target would appear in the sort order.
 The slice must be sorted in increasing order.
 */
-func Binary[E constraints.Ordered](x []E, target E) int {
+func Binary[E cmp.Ordered](x []E, target E) int {
 	lo, hi := 0, len(x)-1
 
 	for lo <= hi {
@@ -34,7 +34,7 @@ If target is not present it returns the index to insert target. The returned ind
 If the slice contains multiple elements with the specified value, there is no guarantee which one will be found.
 The slice must be sorted in increasing order, defined by cmp.
 */
-func BinaryCmp[E, T any](x []E, target T, cmp func(E, T) int) int {
+func BinaryCmp[T any](x []T, target T, cmp func(x, y T) int) int {
 	lo, hi := 0, len(x)-1
 
 	for lo <= hi {
@@ -66,7 +66,7 @@ func BinaryPredicate[T any](x []T, p func(T) bool) int {
 	for lo < hi {
 		mid := int(uint(lo+hi) >> 1)
 
-		if p(x[mid]) == true {
+		if p(x[mid]) {
 			hi = mid
 		} else {
 			lo = mid + 1

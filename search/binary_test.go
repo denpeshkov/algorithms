@@ -1,11 +1,10 @@
 package search
 
 import (
+	"cmp"
 	"fmt"
 	"sort"
 	"testing"
-
-	"golang.org/x/exp/constraints"
 )
 
 var data = []int{0: -10, 1: -5, 2: 0, 3: 1, 4: 2, 5: 3, 6: 5, 7: 7, 8: 11, 9: 100, 10: 100, 11: 100, 12: 1000, 13: 10000}
@@ -18,17 +17,6 @@ func genArr(n int) []int {
 	}
 
 	return x
-}
-
-func cmp[T constraints.Ordered](a, b T) int {
-	switch {
-	case a == b:
-		return 0
-	case a < b:
-		return -1
-	default:
-		return 1
-	}
 }
 
 func TestBinary(t *testing.T) {
@@ -99,7 +87,7 @@ func TestBinaryCmp(t *testing.T) {
 	}
 
 	for _, e := range tests {
-		i := BinaryCmp(e.x, e.target, cmp[int])
+		i := BinaryCmp(e.x, e.target, cmp.Compare)
 
 		if i != e.i {
 			t.Errorf("expected index %d; got %d", e.i, i)
@@ -109,7 +97,7 @@ func TestBinaryCmp(t *testing.T) {
 	for e, v := range data {
 		name := fmt.Sprintf("data %v", e)
 
-		i := BinaryCmp(data, v, cmp[int])
+		i := BinaryCmp(data, v, cmp.Compare)
 
 		if data[i] != v {
 			t.Errorf("%s: expected to find %d; found %d", name, v, data[i])
@@ -209,7 +197,7 @@ func FuzzBinaryCmp(f *testing.F) {
 
 		sort.Slice(r, func(i, j int) bool { return r[i] < r[j] })
 
-		i := BinaryCmp(r, target, cmp[rune])
+		i := BinaryCmp(r, target, cmp.Compare)
 
 		if !isValid(i) {
 			t.Errorf("expected index to insert target to be: %d; got: %d", l, i)
