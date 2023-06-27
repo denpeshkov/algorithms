@@ -1,4 +1,3 @@
-// Package misc contains various miscellaneous algorithms
 package misc
 
 // BoyerMooreVoting finds the majority of a sequence of elements.

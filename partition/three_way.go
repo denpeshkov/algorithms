@@ -1,4 +1,3 @@
-// Package partition provides implementations of algorithms partitioning the input.
 package partition
 
 // ThreeWay reorders the elements in the slice x in such a way that for element with index i:
