@@ -3,8 +3,8 @@ module github.com/denpeshkov/algorithms
 go 1.21
 
 require (
-	github.com/stretchr/testify v1.8.2
-	golang.org/x/exp v0.0.0-20230224173230-c95f2b4c22f2
+	github.com/stretchr/testify v1.8.4
+	golang.org/x/exp v0.0.0-20230626212559-97b1e661b5df
 )
 
 require (
