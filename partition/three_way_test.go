@@ -1,10 +1,8 @@
 package partition_test
 
 import (
+	"cmp"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"golang.org/x/exp/constraints"
 
 	"github.com/denpeshkov/algorithms/partition"
 )
@@ -38,16 +36,9 @@ func testX(x []int, t *testing.T) {
 	}
 }
 
-func cmp[T constraints.Ordered](a T) func(T) int {
+func cmpF[T cmp.Ordered](a T) func(T) int {
 	return func(e T) int {
-		switch {
-		case e == a:
-			return 0
-		case e < a:
-			return -1
-		default:
-			return 1
-		}
+		return cmp.Compare(e, a)
 	}
 }
 
@@ -58,17 +49,17 @@ func testData(t *testing.T) {
 		lt   int
 		gt   int
 	}{
-		{"cmp(0)", cmp(0), 3, 5},
-		{"cmp(4)", cmp(4), 9, 12},
-		{"cmp(-56)", cmp(-56), 0, 0},
-		{"cmp(10000)", cmp(10000), 21, 21},
-		{"cmp(-10001)", cmp(-10001), 0, -1},
-		{"cmp(10001)", cmp(10001), 22, 21},
-		{"cmp(-1)", cmp(-1), 2, 2},
-		{"cmp(100)", cmp(100), 20, 20},
-		{"cmp(12)", cmp(12), 16, 15},
-		{"cmp(1000)", cmp(1000), 21, 20},
-		{"cmp(-50)", cmp(-50), 1, 0},
+		{"cmp(0)", cmpF(0), 3, 5},
+		{"cmp(4)", cmpF(4), 9, 12},
+		{"cmp(-56)", cmpF(-56), 0, 0},
+		{"cmp(10000)", cmpF(10000), 21, 21},
+		{"cmp(-10001)", cmpF(-10001), 0, -1},
+		{"cmp(10001)", cmpF(10001), 22, 21},
+		{"cmp(-1)", cmpF(-1), 2, 2},
+		{"cmp(100)", cmpF(100), 20, 20},
+		{"cmp(12)", cmpF(12), 16, 15},
+		{"cmp(1000)", cmpF(1000), 21, 20},
+		{"cmp(-50)", cmpF(-50), 1, 0},
 	}
 
 	for _, tc := range tests {
@@ -110,7 +101,7 @@ func TestThreeWay(t *testing.T) {
 }
 
 func FuzzThreeWay(fz *testing.F) {
-	testcases := []struct {
+	tests := []struct {
 		s string
 		r rune
 	}{
@@ -123,24 +114,30 @@ func FuzzThreeWay(fz *testing.F) {
 		{"ab", 'b'},
 	}
 
-	for _, tc := range testcases {
+	for _, tc := range tests {
 		fz.Add(tc.s, tc.r)
 	}
 
 	fz.Fuzz(func(t *testing.T, s string, e rune) {
 		x := []rune(s)
-		f := cmp(e)
+		f := cmpF(e)
 
 		lt, gt := partition.ThreeWay(x, f)
 
 		for i := 0; i <= lt-1; i++ {
-			assert.Negativef(t, f(x[i]), "f(x[%v]) = %v; want < 0", i, f(x[i]))
+			if f(x[i]) >= 0 {
+				t.Errorf("f(x[%v]) = %v; want < 0", i, f(x[i]))
+			}
 		}
 		for i := lt; i <= gt; i++ {
-			assert.Zerof(t, f(x[i]), "f(x[%v]) = %v; want < 0", i, f(x[i]))
+			if f(x[i]) != 0 {
+				t.Errorf("f(x[%v]) = %v; want == 0", i, f(x[i]))
+			}
 		}
 		for i := gt + 1; i <= len(x)-1; i++ {
-			assert.Positivef(t, f(x[i]), "f(x[%v]) = %v; want > 0", i, f(x[i]))
+			if f(x[i]) <= 0 {
+				t.Errorf("f(x[%v]) = %v; want > 0", i, f(x[i]))
+			}
 		}
 	})
 }
