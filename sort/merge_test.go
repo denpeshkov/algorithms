@@ -19,9 +19,28 @@ func TestMerge(t *testing.T) {
 	TestReverseSort(sortingFunc, t)
 }
 
+func TestMergeBottomUp(t *testing.T) {
+	sortingFunc := func(x []int) {
+		sort.MergeBottomUpCmp(x, cmp.Compare)
+	}
+
+	TestEmpty(sortingFunc)
+	TestData(sortingFunc, t)
+	TestRandom(1_000, sortingFunc, t)
+	TestReverseSort(sortingFunc, t)
+}
+
 func FuzzMerge(f *testing.F) {
 	sortingFunc := func(s []byte) {
 		sort.MergeCmp(s, cmp.Compare)
+	}
+
+	FuzzSort(sortingFunc, f)
+}
+
+func FuzzMergeBottomUp(f *testing.F) {
+	sortingFunc := func(s []byte) {
+		sort.MergeBottomUpCmp(s, cmp.Compare)
 	}
 
 	FuzzSort(sortingFunc, f)

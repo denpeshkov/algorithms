@@ -1,6 +1,6 @@
 package sort
 
-// MergeCmp implements merge sort using custom comparison function.
+// MergeCmp implements top-down merge sort using custom comparison function.
 func MergeCmp[T any](s []T, cmp func(x, y T) int) {
 	aux := make([]T, len(s))
 
@@ -20,6 +20,24 @@ func mergeCmp[T any](s []T, aux []T, cmp func(x, y T) int) {
 	merge(s[:m], s[m:], aux, cmp)
 
 	copy(s, aux)
+}
+
+// MergeBottomUpCmp implements bottom-up merge sort using custom comparison function.
+func MergeBottomUpCmp[T any](s []T, cmp func(x, y T) int) {
+	n := len(s)
+
+	aux := make([]T, len(s))
+
+	for sz := 1; sz < n; sz *= 2 {
+		for l := 0; l < n-sz; l += 2 * sz {
+			m := l + sz
+			r := min(l+2*sz, n)
+
+			merge(s[l:m], s[m:r], aux, cmp)
+
+			copy(s[l:r], aux)
+		}
+	}
 }
 
 // merge two sorted slices s1 and s2 into one sorted slice aux
