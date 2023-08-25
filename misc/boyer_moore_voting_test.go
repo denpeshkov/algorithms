@@ -21,10 +21,10 @@ func TestBoyerMooreVotingExists(t *testing.T) {
 		major, found := BoyerMooreVoting[int](e.s)
 
 		if !found {
-			t.Errorf("expected found true; got %t", found)
+			t.Errorf("BoyerMooreVoting(%v); expected found = true; got false", e.s)
 		}
 		if major != e.wantMajor {
-			t.Errorf("expected major %d; got %d", e.wantMajor, major)
+			t.Errorf("BoyerMooreVoting(%v); expected major = %d; got %d", e.s, e.wantMajor, major)
 		}
 	}
 }
@@ -42,7 +42,7 @@ func TestBoyerMooreVotingNotExists(t *testing.T) {
 		_, found := BoyerMooreVoting[int](e)
 
 		if found {
-			t.Errorf("expected found false; got %t", found)
+			t.Errorf("BoyerMooreVoting(%v); expected found = false; got true", e)
 		}
 	}
 }

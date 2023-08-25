@@ -9,99 +9,93 @@ import (
 
 var data = []int{0: -10, 1: -5, 2: 0, 3: 1, 4: 2, 5: 3, 6: 5, 7: 7, 8: 11, 9: 100, 10: 100, 11: 100, 12: 1000, 13: 10000}
 
-func genArr(n int) []int {
-	x := make([]int, n)
-
-	for i := 0; i < n; i++ {
-		x[i] = i
-	}
-
-	return x
-}
-
 func TestBinary(t *testing.T) {
-	tests := []struct {
+	tests := map[string]struct {
 		x      []int
 		target int
-		i      int
+		ind    int
 	}{
-		{genArr(0), 0, 0},
-		{genArr(1), 0, 0},
-		{genArr(1), 1, 1},
-		{genArr(1), -1, 0},
-		{genArr(2), 0, 0},
-		{genArr(2), 1, 1},
-		{genArr(2), -1, 0},
-		{genArr(2), 2, 2},
-		{genArr(100), 0, 0},
-		{genArr(100), 99, 99},
-		{genArr(100), 49, 49},
-		{genArr(100), 50, 50},
-		{genArr(100), 51, 51},
-		{genArr(100), 100, 100},
-		{genArr(100), 150, 100},
-		{genArr(100), -150, 0},
+		"[]; 0":         {genArr(0), 0, 0},
+		"[0]; 0":        {genArr(1), 0, 0},
+		"[0]; 1":        {genArr(1), 1, 1},
+		"[0]; 1-":       {genArr(1), -1, 0},
+		"[0..1]; 0":     {genArr(2), 0, 0},
+		"[0..1]; 1":     {genArr(2), 1, 1},
+		"[0..1]; -1":    {genArr(2), -1, 0},
+		"[0..1]; 2":     {genArr(2), 2, 2},
+		"[0..99]; 0":    {genArr(100), 0, 0},
+		"[0..9]; 99":    {genArr(100), 99, 99},
+		"[0..99]; 49":   {genArr(100), 49, 49},
+		"[0..99]; 50":   {genArr(100), 50, 50},
+		"[0..99]; 51":   {genArr(100), 51, 51},
+		"[0..99]; 100":  {genArr(100), 100, 100},
+		"[0.99]; 150":   {genArr(100), 150, 100},
+		"[0..99]; -150": {genArr(100), -150, 0},
 	}
 
-	for _, e := range tests {
-		i := Binary(e.x, e.target)
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			ind := Binary(tt.x, tt.target)
 
-		if i != e.i {
-			t.Errorf("expected index %d; got %d", e.i, i)
-		}
+			if ind != tt.ind {
+				t.Errorf("got %d; want %d", ind, tt.ind)
+			}
+		})
 	}
 
-	for e, v := range data {
-		name := fmt.Sprintf("data %v", e)
+	for i, v := range data {
+		t.Run(fmt.Sprintf("data; %d", v), func(t *testing.T) {
+			ind := Binary(data, v)
 
-		i := Binary(data, v)
-
-		if data[i] != v {
-			t.Errorf("%s: expected to find %d; found %d", name, v, data[i])
-		}
+			if data[ind] != v {
+				t.Errorf("got %d; want %d", ind, i)
+			}
+		})
 	}
 }
 
 func TestBinaryCmp(t *testing.T) {
-	tests := []struct {
+	tests := map[string]struct {
 		x      []int
 		target int
-		i      int
+		ind    int
 	}{
-		{genArr(0), 0, 0},
-		{genArr(1), 0, 0},
-		{genArr(1), 1, 1},
-		{genArr(1), -1, 0},
-		{genArr(2), 0, 0},
-		{genArr(2), 1, 1},
-		{genArr(2), -1, 0},
-		{genArr(2), 2, 2},
-		{genArr(100), 0, 0},
-		{genArr(100), 99, 99},
-		{genArr(100), 49, 49},
-		{genArr(100), 50, 50},
-		{genArr(100), 51, 51},
-		{genArr(100), 100, 100},
-		{genArr(100), 150, 100},
-		{genArr(100), -150, 0},
+		"[]; 0":         {genArr(0), 0, 0},
+		"[0]; 0":        {genArr(1), 0, 0},
+		"[0]; 1":        {genArr(1), 1, 1},
+		"[0]; 1-":       {genArr(1), -1, 0},
+		"[0..1]; 0":     {genArr(2), 0, 0},
+		"[0..1]; 1":     {genArr(2), 1, 1},
+		"[0..1]; -1":    {genArr(2), -1, 0},
+		"[0..1]; 2":     {genArr(2), 2, 2},
+		"[0..99]; 0":    {genArr(100), 0, 0},
+		"[0..9]; 99":    {genArr(100), 99, 99},
+		"[0..99]; 49":   {genArr(100), 49, 49},
+		"[0..99]; 50":   {genArr(100), 50, 50},
+		"[0..99]; 51":   {genArr(100), 51, 51},
+		"[0..99]; 100":  {genArr(100), 100, 100},
+		"[0.99]; 150":   {genArr(100), 150, 100},
+		"[0..99]; -150": {genArr(100), -150, 0},
 	}
 
-	for _, e := range tests {
-		i := BinaryCmp(e.x, e.target, cmp.Compare)
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			ind := BinaryCmp(tt.x, tt.target, cmp.Compare)
 
-		if i != e.i {
-			t.Errorf("expected index %d; got %d", e.i, i)
-		}
+			if ind != tt.ind {
+				t.Errorf("got %d; want %d", ind, tt.ind)
+			}
+		})
 	}
 
-	for e, v := range data {
-		name := fmt.Sprintf("data %v", e)
+	for i, v := range data {
+		t.Run(fmt.Sprintf("data; %d", v), func(t *testing.T) {
+			ind := BinaryCmp(data, v, cmp.Compare)
 
-		i := BinaryCmp(data, v, cmp.Compare)
-
-		if data[i] != v {
-			t.Errorf("%s: expected to find %d; found %d", name, v, data[i])
-		}
+			if data[ind] != v {
+				t.Errorf("got %d; want %d", ind, i)
+			}
+		})
 	}
 }
 
@@ -112,39 +106,37 @@ func TestBinaryPredicate(t *testing.T) {
 		}
 	}
 
-	tests := []struct {
-		x []int
-		f func(int) bool
-		i int
+	tests := map[string]struct {
+		x   []int
+		f   func(int) bool
+		ind int
 	}{
-		{genArr(0), nil, 0},
-		{genArr(1), p(1), 1},
-		{genArr(1), func(i int) bool { return true }, 0},
-		{genArr(1), func(i int) bool { return false }, 1},
-		{genArr(100), p(91), 91},
-		{genArr(100), func(i int) bool { return true }, 0},
-		{genArr(100), func(i int) bool { return false }, 100},
-		{data, p(-20), 0},
-		{data, p(-10), 0},
-		{data, p(-9), 1},
-		{data, p(-6), 1},
-		{data, p(-5), 1},
-		{data, p(3), 5},
-		{data, p(11), 8},
-		{data, p(99), 9},
-		{data, p(100), 9},
-		{data, p(101), 12},
-		{data, p(10000), 13},
-		{data, p(10001), 14},
-		{genArr(7), func(i int) bool { return []int{99, 99, 59, 42, 7, 0, -1, -1}[i] <= 7 }, 4},
-		{genArr(100), func(i int) bool { return 100-i <= 7 }, 100 - 7},
+		"[]; nil":        {genArr(0), nil, 0},
+		"[0]; >=1":       {genArr(1), p(1), 1},
+		"[0]; true":      {genArr(1), func(i int) bool { return true }, 0},
+		"[0]; false":     {genArr(1), func(i int) bool { return false }, 1},
+		"[0..99]; >=91":  {genArr(100), p(91), 91},
+		"[0..99]; true":  {genArr(100), func(i int) bool { return true }, 0},
+		"[0..99]; false": {genArr(100), func(i int) bool { return false }, 100},
+		"data; >=-20":    {data, p(-20), 0},
+		"data; >=-10":    {data, p(-10), 0},
+		"data; >=-9":     {data, p(-9), 1},
+		"data; >=-6":     {data, p(-6), 1},
+		"data; >=-5":     {data, p(-5), 1},
+		"data; >=3":      {data, p(3), 5},
+		"data; >=11":     {data, p(11), 8},
+		"data; >=99":     {data, p(99), 9},
+		"data; >=100":    {data, p(100), 9},
+		"data; >=101":    {data, p(101), 12},
+		"data; >=10000":  {data, p(10000), 13},
+		"data; >=10001":  {data, p(10001), 14},
 	}
 
 	for _, e := range tests {
-		i := BinaryPredicate(e.x, e.f)
+		ind := BinaryPredicate(e.x, e.f)
 
-		if i != e.i {
-			t.Errorf("expected index %d; got %d", e.i, i)
+		if ind != e.ind {
+			t.Errorf("got %d; want %d", ind, e.ind)
 		}
 	}
 }
@@ -203,4 +195,12 @@ func FuzzBinaryCmp(f *testing.F) {
 			t.Errorf("expected index to insert target to be: %d; got: %d", l, i)
 		}
 	})
+}
+
+func genArr(n int) []int {
+	x := make([]int, n)
+	for i := 0; i < n; i++ {
+		x[i] = i
+	}
+	return x
 }

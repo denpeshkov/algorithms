@@ -42,12 +42,10 @@ func TestBinaryCmp(t *testing.T) {
 	for _, e := range tests {
 		r := merge.BinaryCmp(e.s, e.t, cmp.Compare)
 
-		if a := append(e.s, e.t...); !containsAllElements(a, r) {
-			t.Error("merged slice contains not all of the elements")
-		}
-
-		if !slices.IsSortedFunc(r, cmp.Compare) {
-			t.Errorf("merged slice is not sorted")
+		a := append(e.s, e.t...)
+		slices.SortFunc(a, cmp.Compare)
+		if !slices.Equal(r, a) {
+			t.Errorf("BinaryCmp(%v, %v) = %v; want %v", e.s, e.t, r, a)
 		}
 	}
 }
@@ -59,20 +57,10 @@ func FuzzBinaryCmp(f *testing.F) {
 
 		r := merge.BinaryCmp(s1, s2, cmp.Compare)
 
-		if a := append(s1, s2...); !containsAllElements(a, r) {
-			t.Error("merged slice contains not all of the elements")
-		}
-
-		if !slices.IsSortedFunc(r, cmp.Compare) {
-			t.Errorf("merged slice is not sorted")
+		a := append(s1, s2...)
+		slices.SortFunc(a, cmp.Compare)
+		if !slices.Equal(r, a) {
+			t.Errorf("BinaryCmp(%v, %v) = %v; want %v", s1, s2, r, a)
 		}
 	})
-}
-
-// Returns true if t contains all of the elements of s; otherwise returns false.
-// Meaning t is a permutation of s.
-func containsAllElements[T cmp.Ordered](s, t []T) bool {
-	slices.Sort(s)
-	slices.Sort(t)
-	return slices.Equal(s, t)
 }

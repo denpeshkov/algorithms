@@ -1,6 +1,7 @@
 package numeric_test
 
 import (
+	"fmt"
 	"math/big"
 	"testing"
 
@@ -28,11 +29,13 @@ func TestFastExp(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		got := numeric.FastExp(tt.a, tt.n)
-		want, _ := new(big.Int).SetString(tt.want, 0)
+		t.Run(fmt.Sprintf("%d^%d", tt.a, tt.n), func(t *testing.T) {
+			got := numeric.FastExp(tt.a, tt.n)
+			want, _ := new(big.Int).SetString(tt.want, 0)
 
-		if got.Cmp(want) != 0 {
-			t.Errorf("FastExp(%v, %v) = %v, want %v", tt.a, tt.n, got, tt.want)
-		}
+			if got.Cmp(want) != 0 {
+				t.Errorf("got %v; want %v", got, tt.want)
+			}
+		})
 	}
 }

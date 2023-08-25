@@ -1,3 +1,4 @@
+// Based on: https://cs.opensource.google/go/go/+/refs/tags/go1.21.0:src/math/rand/rand_test.go
 package shuffle
 
 import (

@@ -17,9 +17,9 @@ func testX(x []int, t *testing.T) {
 		lt   int
 		gt   int
 	}{
-		{"-1", func(int) int { return -1 }, len(x), len(x) - 1},
-		{"0", func(int) int { return 0 }, 0, len(x) - 1},
-		{"1", func(int) int { return 1 }, 0, -1},
+		{"data; f(): -1", func(int) int { return -1 }, len(x), len(x) - 1},
+		{"data; f(): 0", func(int) int { return 0 }, 0, len(x) - 1},
+		{"data; f(): 1", func(int) int { return 1 }, 0, -1},
 	}
 
 	for _, tc := range tests {
@@ -27,10 +27,7 @@ func testX(x []int, t *testing.T) {
 			lt, gt := partition.ThreeWay(x, tc.f)
 
 			if !(tc.lt == lt && tc.gt == gt) {
-				t.Errorf("data = %v", data)
-				t.Errorf("f is %s", tc.name)
-
-				t.Errorf("ThreeWay(data, f) = %v, %v; want %v, %v", lt, gt, tc.lt, tc.gt)
+				t.Errorf("got %v, %v; want %v, %v", lt, gt, tc.lt, tc.gt)
 			}
 		})
 	}
@@ -49,17 +46,17 @@ func testData(t *testing.T) {
 		lt   int
 		gt   int
 	}{
-		{"cmp(0)", cmpF(0), 3, 5},
-		{"cmp(4)", cmpF(4), 9, 12},
-		{"cmp(-56)", cmpF(-56), 0, 0},
-		{"cmp(10000)", cmpF(10000), 21, 21},
-		{"cmp(-10001)", cmpF(-10001), 0, -1},
-		{"cmp(10001)", cmpF(10001), 22, 21},
-		{"cmp(-1)", cmpF(-1), 2, 2},
-		{"cmp(100)", cmpF(100), 20, 20},
-		{"cmp(12)", cmpF(12), 16, 15},
-		{"cmp(1000)", cmpF(1000), 21, 20},
-		{"cmp(-50)", cmpF(-50), 1, 0},
+		{"data; cmp(0)", cmpF(0), 3, 5},
+		{"data; cmp(4)", cmpF(4), 9, 12},
+		{"data; cmp(-56)", cmpF(-56), 0, 0},
+		{"data; cmp(10000)", cmpF(10000), 21, 21},
+		{"data; cmp(-10001)", cmpF(-10001), 0, -1},
+		{"data; cmp(10001)", cmpF(10001), 22, 21},
+		{"data; cmp(-1)", cmpF(-1), 2, 2},
+		{"data; cmp(100)", cmpF(100), 20, 20},
+		{"data; cmp(12)", cmpF(12), 16, 15},
+		{"data; cmp(1000)", cmpF(1000), 21, 20},
+		{"data; cmp(-50)", cmpF(-50), 1, 0},
 	}
 
 	for _, tc := range tests {
@@ -67,10 +64,7 @@ func testData(t *testing.T) {
 			lt, gt := partition.ThreeWay(data, tc.f)
 
 			if !(tc.lt == lt && tc.gt == gt) {
-				t.Errorf("data = %v", data)
-				t.Errorf("f is %s", tc.name)
-
-				t.Errorf("ThreeWay(data, f) = %v, %v; want %v, %v", lt, gt, tc.lt, tc.gt)
+				t.Errorf("got %v, %v; want %v, %v", lt, gt, tc.lt, tc.gt)
 			}
 		})
 	}

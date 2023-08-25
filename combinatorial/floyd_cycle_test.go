@@ -1,12 +1,14 @@
 package combinatorial_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/denpeshkov/algorithms/combinatorial"
 )
 
-func genCycle(l int) [][]int {
+// genCycles generates cycles of the form [[l-1 -> 0], [l-1 -> 1] ... [l-1 -> l-1]]
+func genCycles(l int) [][]int {
 	a := make([]int, l)
 	var res [][]int
 
@@ -25,22 +27,22 @@ func genCycle(l int) [][]int {
 }
 
 func TestFloydCycle(t *testing.T) {
-	ls := []int{1, 2, 3, 4, 5, 7, 9, 11, 13, 19, 20, 50, 100, 101, 1000}
+	lengths := []int{1, 2, 3, 4, 5, 7, 9, 11, 13, 19, 20, 50, 100, 101, 1000}
 
-	for _, l := range ls {
-		as := genCycle(l)
+	for _, l := range lengths {
+		as := genCycles(l)
 
 		for i, a := range as {
-			t.Logf("Iterated function graph %v", a)
+			t.Run(fmt.Sprintf("%d->%d", l-1, i), func(t *testing.T) {
+				ind, len := combinatorial.FloydCycle(func(i int) int { return a[i] }, 0)
 
-			ind, len := combinatorial.FloydCycle(func(i int) int { return a[i] }, 0)
-
-			if ind != i {
-				t.Errorf("Expected ind to be: %d; got: %d", i, ind)
-			}
-			if len != l-i {
-				t.Errorf("Expected len to be: %d; got: %d", l, len)
-			}
+				if ind != i {
+					t.Errorf("ind = %d; want %d", ind, i)
+				}
+				if len != l-i {
+					t.Errorf("len = %d; want %d", len, l)
+				}
+			})
 		}
 	}
 }
