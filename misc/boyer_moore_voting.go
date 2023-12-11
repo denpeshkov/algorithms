@@ -1,8 +1,8 @@
 package misc
 
-// BoyerMooreVoting finds the majority of a sequence of elements.
-// Returns the majority element if there is one, otherwise returns an arbitrary element;
-// it also returns a bool saying whether the majority is really exists in the slice.
+// BoyerMooreVoting finds the majority element in a sequence of elements.
+// It returns the majority element if one exists; otherwise, it returns an arbitrary element.
+// Additionally, it returns a boolean indicating whether the majority element truly exists in the slice.
 func BoyerMooreVoting[T comparable](s []T) (major T, found bool) {
 	count := 0
 
@@ -18,7 +18,7 @@ func BoyerMooreVoting[T comparable](s []T) (major T, found bool) {
 		}
 	}
 
-	// verify that the element found in the first pass really is a majority
+	// Verify that the element found in the first pass is indeed a majority.
 	count = 0
 	for _, v := range s {
 		if v == major {

@@ -7,7 +7,7 @@ import (
 	"github.com/denpeshkov/algorithms/combinatorial"
 )
 
-// genCycles generates cycles of the form [[l-1 -> 0], [l-1 -> 1] ... [l-1 -> l-1]]
+// genCycles generates cycles of the form [[l-1 -> 0], [l-1 -> 1] ... [l-1 -> l-1]].
 func genCycles(l int) [][]int {
 	a := make([]int, l)
 	var res [][]int

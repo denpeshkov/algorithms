@@ -2,7 +2,7 @@ package shuffle
 
 import "math/rand"
 
-// FisherYates implements "inside-out" version of Fisher-Yates shuffle.
+// FisherYates implements the "inside-out" version of the Fisher-Yates shuffle.
 func FisherYates[T any](x []T) {
 	for i := range x {
 		r := rand.Intn(i + 1)

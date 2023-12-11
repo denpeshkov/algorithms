@@ -1,6 +1,6 @@
 package merge
 
-// BinaryCmp merges two sorted slices s and t into resulting sorted slice using custom comparison function.
+// BinaryCmp merges two sorted slices, s and t, into a resulting sorted slice using a custom comparison function.
 func BinaryCmp[T any](s, t []T, cmp func(a, b T) int) []T {
 	lenS, lenT := len(s), len(t)
 	lenR := lenS + lenT

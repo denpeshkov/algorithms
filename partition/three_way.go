@@ -1,11 +1,12 @@
 package partition
 
-// ThreeWay reorders the elements in the slice x in such a way that for element with index i:
+// ThreeWay reorders the elements in the slice x in such a way that for the element with index i:
 //   - f(x[i]) < 0 for i in [0, lt-1];
 //   - f(x[i]) == 0 for i in [lt, gt];
 //   - f(x[i]) > 0 for i in [gt+1, len(x)-1].
 //
-// Returns two indexes lt and gt.
+// It returns two indexes, lt and gt.
+
 func ThreeWay[T any](x []T, f func(e T) int) (lt, gt int) {
 	N := len(x)
 
