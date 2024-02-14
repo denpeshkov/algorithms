@@ -1,9 +1,8 @@
 package sort
 
-// InsertionCmp implements insertion sort using custom comparison function.
-func InsertionCmp[T any](s []T, cmp func(x, y T) int) {
+// InsertionFunc implements an insertion sort using a custom comparison function.
+func InsertionFunc[S ~[]E, E any](s S, cmp func(a, b E) int) {
 	n := len(s)
-
 	for i := 1; i < n; i++ {
 		v := s[i]
 		j := i - 1

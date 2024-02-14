@@ -1,8 +1,8 @@
 package sort
 
-// MergeCmp implements top-down merge sort using custom comparison function.
-func MergeCmp[T any](s []T, cmp func(x, y T) int) {
-	aux := make([]T, len(s))
+// MergeFunc implements top-down merge sort using custom comparison function.
+func MergeFunc[S ~[]E, E any](s S, cmp func(a, b E) int) {
+	aux := make([]E, len(s))
 
 	mergeCmp(s, aux, cmp)
 }
@@ -22,11 +22,11 @@ func mergeCmp[T any](s []T, aux []T, cmp func(x, y T) int) {
 	copy(s, aux)
 }
 
-// MergeBottomUpCmp implements bottom-up merge sort using custom comparison function.
-func MergeBottomUpCmp[T any](s []T, cmp func(x, y T) int) {
+// MergeBottomUpFunc implements bottom-up merge sort using custom comparison function.
+func MergeBottomUpFunc[S ~[]E, E any](s S, cmp func(x, y E) int) {
 	n := len(s)
 
-	aux := make([]T, len(s))
+	aux := make([]E, len(s))
 
 	for sz := 1; sz < n; sz *= 2 {
 		for l := 0; l < n-sz; l += 2 * sz {
@@ -41,7 +41,7 @@ func MergeBottomUpCmp[T any](s []T, cmp func(x, y T) int) {
 }
 
 // merge two sorted slices s1 and s2 into one sorted slice aux
-func merge[T any](s1, s2 []T, aux []T, cmp func(x, y T) int) {
+func merge[S ~[]E, E any](s1, s2 S, aux S, cmp func(x, y E) int) {
 	n1, n2 := len(s1), len(s2)
 	n := n1 + n2
 

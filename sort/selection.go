@@ -1,9 +1,8 @@
 package sort
 
-// SelectionCmp implements selection sort using custom comparison function.
-func SelectionCmp[T any](s []T, cmp func(x, y T) int) {
+// SelectionFunc implements a selection sort using a custom comparison function.
+func SelectionFunc[S ~[]E, E any](s S, cmp func(a, b E) int) {
 	n := len(s)
-
 	for i := 0; i < n; i++ {
 		min := i
 		for j := i + 1; j < n; j++ {
