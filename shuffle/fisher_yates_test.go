@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"math/rand"
+	"math/rand/v2"
 	"testing"
 )
 
@@ -33,14 +33,14 @@ func nearEqual(a, b, closeEnough, maxError float64) bool {
 
 // checkSimilarDistribution returns success if the mean and stddev of the
 // two statsResults are similar.
-func (this *statsResults) checkSimilarDistribution(expected *statsResults) error {
-	if !nearEqual(this.mean, expected.mean, expected.closeEnough, expected.maxError) {
-		s := fmt.Sprintf("mean %v != %v (allowed error %v, %v)", this.mean, expected.mean, expected.closeEnough, expected.maxError)
+func (r *statsResults) checkSimilarDistribution(expected *statsResults) error {
+	if !nearEqual(r.mean, expected.mean, expected.closeEnough, expected.maxError) {
+		s := fmt.Sprintf("mean %v != %v (allowed error %v, %v)", r.mean, expected.mean, expected.closeEnough, expected.maxError)
 		fmt.Println(s)
 		return errors.New(s)
 	}
-	if !nearEqual(this.stddev, expected.stddev, expected.closeEnough, expected.maxError) {
-		s := fmt.Sprintf("stddev %v != %v (allowed error %v, %v)", this.stddev, expected.stddev, expected.closeEnough, expected.maxError)
+	if !nearEqual(r.stddev, expected.stddev, expected.closeEnough, expected.maxError) {
+		s := fmt.Sprintf("stddev %v != %v (allowed error %v, %v)", r.stddev, expected.stddev, expected.closeEnough, expected.maxError)
 		fmt.Println(s)
 		return errors.New(s)
 	}
@@ -92,7 +92,7 @@ func encodePerm(s []int) int {
 }
 
 func TestShuffle(t *testing.T) {
-	rand.Seed(1)
+	s := rand.NewPCG(1, 1)
 	top := 6
 
 	if testing.Short() {
@@ -115,7 +115,7 @@ func TestShuffle(t *testing.T) {
 					p[i] = i
 				}
 
-				FisherYates(p)
+				fisherYates(p, rand.New(s))
 
 				return encodePerm(p)
 			}
