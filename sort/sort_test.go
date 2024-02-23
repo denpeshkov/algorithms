@@ -1,4 +1,4 @@
-// Based on https://github.com/golang/go/blob/master/src/sort/sort_test.go
+// Based on https://github.com/golang/go/blob/master/src/slices/sort_test.go
 
 package sort_test
 
@@ -30,6 +30,7 @@ func TestSortFuncEmptyNil(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(fmt.Sprintf("%s empty slice", tc.sortAlg), func(t *testing.T) {
+			t.Parallel()
 			defer func() {
 				if r := recover(); r != nil {
 					t.Errorf("got unexpected panic")
@@ -64,6 +65,7 @@ func TestSortFuncData(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.sortAlg, func(t *testing.T) {
+			t.Parallel()
 			data := append([]int(nil), ints...)
 
 			tc.sortFunc(data, cmp.Compare)
@@ -94,6 +96,7 @@ func TestSortFuncRandom(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.sortAlg, func(t *testing.T) {
+			t.Parallel()
 			data := append([]int(nil), data...)
 			if slices.IsSorted(data) {
 				t.Fatalf("terrible rand.rand")
@@ -124,6 +127,7 @@ func TestSortFuncReverse(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.sortAlg, func(t *testing.T) {
+			t.Parallel()
 			data := append([]int(nil), data...)
 			revData := append([]int(nil), revData...)
 
@@ -134,6 +138,104 @@ func TestSortFuncReverse(t *testing.T) {
 				if data[i] != revData[len(data)-1-i] {
 					t.Errorf("reverse sort didn't sort")
 				}
+			}
+		})
+	}
+}
+
+type intPair struct {
+	a, b int
+}
+
+type intPairs []intPair
+
+// Pairs compare on a only.
+func intPairCmp(x, y intPair) int {
+	return x.a - y.a
+}
+
+// Record initial order in B.
+func (d intPairs) initB() {
+	for i := range d {
+		d[i].b = i
+	}
+}
+
+// InOrder checks if a-equal elements were not reordered.
+func (d intPairs) inOrder() bool {
+	lastA, lastB := -1, 0
+	for i := 0; i < len(d); i++ {
+		if lastA != d[i].a {
+			lastA = d[i].a
+			lastB = d[i].b
+			continue
+		}
+		if d[i].b <= lastB {
+			return false
+		}
+		lastB = d[i].b
+	}
+	return true
+}
+
+func TestStability(t *testing.T) {
+	testCases := []struct {
+		sortAlg  string
+		sortFunc func(s intPairs, cmp func(a, b intPair) int)
+	}{
+		{sortAlg: "merge sort top-down", sortFunc: sort.MergeFunc[intPairs]},
+		{sortAlg: "merge sort bottom-up", sortFunc: sort.MergeBottomUpFunc[intPairs]},
+	}
+
+	n, m := 100000, 1000
+	if testing.Short() {
+		n, m = 1000, 100
+	}
+
+	data := make(intPairs, n)
+	// random distribution
+	for i := 0; i < len(data); i++ {
+		data[i].a = rand.Intn(m)
+	}
+	if slices.IsSortedFunc(data, intPairCmp) {
+		t.Fatalf("terrible rand.rand")
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.sortAlg, func(t *testing.T) {
+			t.Parallel()
+			data := append(intPairs(nil), data...)
+
+			data.initB()
+			tc.sortFunc(data, intPairCmp)
+			if !slices.IsSortedFunc(data, intPairCmp) {
+				t.Errorf("Stable didn't sort %d ints", n)
+			}
+			if !data.inOrder() {
+				t.Errorf("Stable wasn't stable on %d ints", n)
+			}
+
+			// already sorted
+			data.initB()
+			tc.sortFunc(data, intPairCmp)
+			if !slices.IsSortedFunc(data, intPairCmp) {
+				t.Errorf("Stable shuffled sorted %d ints (order)", n)
+			}
+			if !data.inOrder() {
+				t.Errorf("Stable shuffled sorted %d ints (stability)", n)
+			}
+
+			// sorted reversed
+			for i := 0; i < len(data); i++ {
+				data[i].a = len(data) - i
+			}
+			data.initB()
+			tc.sortFunc(data, intPairCmp)
+			if !slices.IsSortedFunc(data, intPairCmp) {
+				t.Errorf("Stable didn't sort %d ints", n)
+			}
+			if !data.inOrder() {
+				t.Errorf("Stable wasn't stable on %d ints", n)
 			}
 		})
 	}

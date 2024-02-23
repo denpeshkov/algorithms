@@ -53,7 +53,7 @@ func merge[S ~[]E, E any](s1, s2 S, aux S, cmp func(x, y E) int) {
 		case j >= n2:
 			aux[k] = s1[i]
 			i++
-		case cmp(s1[i], s2[j]) <= 0:
+		case cmp(s1[i], s2[j]) <= 0: // ensures stability
 			aux[k] = s1[i]
 			i++
 		default:
