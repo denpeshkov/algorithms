@@ -3,8 +3,6 @@
 package sort_test
 
 import (
-	"cmp"
-	"fmt"
 	"math/rand"
 	"slices"
 	"testing"
@@ -12,134 +10,76 @@ import (
 	"github.com/denpeshkov/algorithms/sort"
 )
 
-var ints = []int{74, 59, 238, -784, 9845, 959, 905, 0, 0, 42, 7586, -5467984, 7586}
+func testSortFuncEmptyNil[S ~[]E, E any](t *testing.T, sortFunc func(S, func(E, E) int), cmp func(E, E) int) {
+	emptySlice := []E{}
+	var nilSlice []E
 
-func TestSortFuncEmptyNil(t *testing.T) {
-	testCases := []struct {
-		sortAlg  string
-		sortFunc func(s []int, cmp func(a, b int) int)
-	}{
-		{sortAlg: "insertion sort", sortFunc: sort.InsertionFunc[[]int]},
-		{sortAlg: "selection sort", sortFunc: sort.SelectionFunc[[]int]},
-		{sortAlg: "merge sort top-down", sortFunc: sort.MergeFunc[[]int]},
-		{sortAlg: "merge sort bottom-up", sortFunc: sort.MergeBottomUpFunc[[]int]},
-	}
-
-	empty := []int{}
-	var nilSlice []int
-
-	for _, tc := range testCases {
-		t.Run(fmt.Sprintf("%s empty slice", tc.sortAlg), func(t *testing.T) {
-			t.Parallel()
-			defer func() {
-				if r := recover(); r != nil {
-					t.Errorf("got unexpected panic")
-				}
-			}()
-
-			tc.sortFunc(empty, cmp.Compare)
-		})
-
-		t.Run(fmt.Sprintf("%s nil slice", tc.sortAlg), func(t *testing.T) {
-			defer func() {
-				if r := recover(); r != nil {
-					t.Errorf("got unexpected panic")
-				}
-			}()
-
-			tc.sortFunc(nilSlice, cmp.Compare)
-		})
-	}
-}
-
-func TestSortFuncData(t *testing.T) {
-	testCases := []struct {
-		sortAlg  string
-		sortFunc func(s []int, cmp func(a, b int) int)
-	}{
-		{sortAlg: "insertion sort", sortFunc: sort.InsertionFunc[[]int]},
-		{sortAlg: "selection sort", sortFunc: sort.SelectionFunc[[]int]},
-		{sortAlg: "merge sort top-down", sortFunc: sort.MergeFunc[[]int]},
-		{sortAlg: "merge sort bottom-up", sortFunc: sort.MergeBottomUpFunc[[]int]},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.sortAlg, func(t *testing.T) {
-			t.Parallel()
-			data := append([]int(nil), ints...)
-
-			tc.sortFunc(data, cmp.Compare)
-
-			if !slices.IsSorted(data) {
-				t.Errorf("sorted %v", ints)
-				t.Errorf("   got %v", data)
+	t.Run("empty slice", func(t *testing.T) {
+		t.Parallel()
+		defer func() {
+			if r := recover(); r != nil {
+				t.Errorf("got unexpected panic")
 			}
-		})
+		}()
+
+		sortFunc(emptySlice, cmp)
+	})
+
+	t.Run("nil slice", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Errorf("got unexpected panic")
+			}
+		}()
+
+		sortFunc(nilSlice, cmp)
+	})
+}
+
+func testSortFuncData[S ~[]E, E any](t *testing.T, sortFunc func(S, func(E, E) int), cmp func(E, E) int, data S) {
+	t.Parallel()
+
+	data = append(S(nil), data...)
+
+	sortFunc(data, cmp)
+
+	if !slices.IsSortedFunc(data, cmp) {
+		t.Errorf("got unsorted slice: %v, want sorted slice", data)
 	}
 }
 
-func TestSortFuncRandom(t *testing.T) {
-	testCases := []struct {
-		sortAlg  string
-		sortFunc func(s []int, cmp func(a, b int) int)
-	}{
-		{sortAlg: "insertion sort", sortFunc: sort.InsertionFunc[[]int]},
-		{sortAlg: "selection sort", sortFunc: sort.SelectionFunc[[]int]},
-		{sortAlg: "merge sort top-down", sortFunc: sort.MergeFunc[[]int]},
-		{sortAlg: "merge sort bottom-up", sortFunc: sort.MergeBottomUpFunc[[]int]},
+func testSortFuncReverse[S ~[]E, E any](t *testing.T, sortFunc func(S, func(E, E) int), cmp func(E, E) int, data S) {
+	t.Parallel()
+
+	data = append(S(nil), data...)
+	data1 := append(S(nil), data...)
+
+	sortFunc(data, cmp)
+	sortFunc(data1, reverse(cmp))
+
+	for i := 0; i < len(data); i++ {
+		if cmp(data[i], data1[len(data)-1-i]) != 0 {
+			t.Error("reverse sort didn't sort")
+		}
 	}
+}
+
+func testSortFuncRandomInts(t *testing.T, sortFunc func([]int, func(int, int) int), cmp func(int, int) int) {
+	t.Parallel()
 
 	n := 1000
 	data := make([]int, n)
 	for i := 0; i < len(data); i++ {
 		data[i] = rand.Intn(1000)
 	}
-	for _, tc := range testCases {
-		t.Run(tc.sortAlg, func(t *testing.T) {
-			t.Parallel()
-			data := append([]int(nil), data...)
-			if slices.IsSorted(data) {
-				t.Fatalf("terrible rand.rand")
-			}
-
-			sort.InsertionFunc(data, cmp.Compare)
-
-			if !slices.IsSorted(data) {
-				t.Errorf("sort didn't sort - %d random ints", n)
-			}
-		})
-	}
-}
-
-func TestSortFuncReverse(t *testing.T) {
-	testCases := []struct {
-		sortAlg  string
-		sortFunc func(s []int, cmp func(a, b int) int)
-	}{
-		{sortAlg: "insertion sort", sortFunc: sort.InsertionFunc[[]int]},
-		{sortAlg: "selection sort", sortFunc: sort.SelectionFunc[[]int]},
-		{sortAlg: "merge sort top-down", sortFunc: sort.MergeFunc[[]int]},
-		{sortAlg: "merge sort bottom-up", sortFunc: sort.MergeBottomUpFunc[[]int]},
+	if slices.IsSorted(data) {
+		t.Fatal("terrible rand")
 	}
 
-	data := append([]int(nil), ints...)
-	revData := append([]int(nil), ints...)
+	sort.InsertionFunc(data, cmp)
 
-	for _, tc := range testCases {
-		t.Run(tc.sortAlg, func(t *testing.T) {
-			t.Parallel()
-			data := append([]int(nil), data...)
-			revData := append([]int(nil), revData...)
-
-			sort.InsertionFunc(data, cmp.Compare)
-			sort.InsertionFunc(revData, reverse[int](cmp.Compare))
-
-			for i := 0; i < len(data); i++ {
-				if data[i] != revData[len(data)-1-i] {
-					t.Errorf("reverse sort didn't sort")
-				}
-			}
-		})
+	if !slices.IsSorted(data) {
+		t.Errorf("sort didn't sort - %d random ints", n)
 	}
 }
 
@@ -178,19 +118,8 @@ func (d intPairs) inOrder() bool {
 	return true
 }
 
-func TestStability(t *testing.T) {
-	testCases := []struct {
-		sortAlg  string
-		sortFunc func(s intPairs, cmp func(a, b intPair) int)
-	}{
-		{sortAlg: "merge sort top-down", sortFunc: sort.MergeFunc[intPairs]},
-		{sortAlg: "merge sort bottom-up", sortFunc: sort.MergeBottomUpFunc[intPairs]},
-	}
-
-	n, m := 100000, 1000
-	if testing.Short() {
-		n, m = 1000, 100
-	}
+func testSortFuncStability(t *testing.T, sortFunc func(intPairs, func(intPair, intPair) int), n, m int) {
+	t.Parallel()
 
 	data := make(intPairs, n)
 	// random distribution
@@ -198,116 +127,55 @@ func TestStability(t *testing.T) {
 		data[i].a = rand.Intn(m)
 	}
 	if slices.IsSortedFunc(data, intPairCmp) {
-		t.Fatalf("terrible rand.rand")
+		t.Fatal("terrible rand")
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.sortAlg, func(t *testing.T) {
-			t.Parallel()
-			data := append(intPairs(nil), data...)
+	data.initB()
+	sortFunc(data, intPairCmp)
+	if !slices.IsSortedFunc(data, intPairCmp) {
+		t.Errorf("Stable didn't sort %d ints", n)
+	}
+	if !data.inOrder() {
+		t.Errorf("Stable wasn't stable on %d ints", n)
+	}
 
-			data.initB()
-			tc.sortFunc(data, intPairCmp)
-			if !slices.IsSortedFunc(data, intPairCmp) {
-				t.Errorf("Stable didn't sort %d ints", n)
-			}
-			if !data.inOrder() {
-				t.Errorf("Stable wasn't stable on %d ints", n)
-			}
+	// already sorted
+	data.initB()
+	sortFunc(data, intPairCmp)
+	if !slices.IsSortedFunc(data, intPairCmp) {
+		t.Errorf("Stable shuffled sorted %d ints (order)", n)
+	}
+	if !data.inOrder() {
+		t.Errorf("Stable shuffled sorted %d ints (stability)", n)
+	}
 
-			// already sorted
-			data.initB()
-			tc.sortFunc(data, intPairCmp)
-			if !slices.IsSortedFunc(data, intPairCmp) {
-				t.Errorf("Stable shuffled sorted %d ints (order)", n)
-			}
-			if !data.inOrder() {
-				t.Errorf("Stable shuffled sorted %d ints (stability)", n)
-			}
-
-			// sorted reversed
-			for i := 0; i < len(data); i++ {
-				data[i].a = len(data) - i
-			}
-			data.initB()
-			tc.sortFunc(data, intPairCmp)
-			if !slices.IsSortedFunc(data, intPairCmp) {
-				t.Errorf("Stable didn't sort %d ints", n)
-			}
-			if !data.inOrder() {
-				t.Errorf("Stable wasn't stable on %d ints", n)
-			}
-		})
+	// sorted reversed
+	for i := 0; i < len(data); i++ {
+		data[i].a = len(data) - i
+	}
+	data.initB()
+	sortFunc(data, intPairCmp)
+	if !slices.IsSortedFunc(data, intPairCmp) {
+		t.Errorf("Stable didn't sort %d ints", n)
+	}
+	if !data.inOrder() {
+		t.Errorf("Stable wasn't stable on %d ints", n)
 	}
 }
 
-func BenchmarkSortFunc1K(b *testing.B) {
-	benchs := []struct {
-		sortAlg  string
-		sortFunc func(s []int, cmp func(a, b int) int)
-	}{
-		{sortAlg: "insertion sort", sortFunc: sort.InsertionFunc[[]int]},
-		{sortAlg: "selection sort", sortFunc: sort.SelectionFunc[[]int]},
-		{sortAlg: "merge sort top-down", sortFunc: sort.MergeFunc[[]int]},
-		{sortAlg: "merge sort bottom-up", sortFunc: sort.MergeBottomUpFunc[[]int]},
-	}
-
-	for _, bm := range benchs {
-		b.Run(bm.sortAlg, func(b *testing.B) {
-			b.StopTimer()
-			for i := 0; i < b.N; i++ {
-				data := make([]int, 1<<10)
-				for i := 0; i < len(data); i++ {
-					data[i] = i ^ 0x2cc
-				}
-				b.StartTimer()
-				bm.sortFunc(data, cmp.Compare)
-				b.StopTimer()
-			}
-		})
+func benchmarkSortFunc1K(b *testing.B, sortFunc func([]int, func(int, int) int), cmp func(int, int) int) {
+	b.StopTimer()
+	for i := 0; i < b.N; i++ {
+		data := make([]int, 1<<10)
+		for i := 0; i < len(data); i++ {
+			data[i] = i ^ 0x2cc
+		}
+		b.StartTimer()
+		sortFunc(data, cmp)
+		b.StopTimer()
 	}
 }
 
-func FuzzInsertionSortFunc(f *testing.F) {
-	f.Fuzz(func(t *testing.T, s []byte) {
-		sort.InsertionFunc(s, cmp.Compare)
-
-		if !slices.IsSortedFunc(s, cmp.Compare) {
-			t.Errorf("slice was not sorted")
-		}
-	})
-}
-
-func FuzzSelectionSortFunc(f *testing.F) {
-	f.Fuzz(func(t *testing.T, s []byte) {
-		sort.SelectionFunc(s, cmp.Compare)
-
-		if !slices.IsSortedFunc(s, cmp.Compare) {
-			t.Errorf("slice was not sorted")
-		}
-	})
-}
-
-func FuzzMergeSortFunc(f *testing.F) {
-	f.Fuzz(func(t *testing.T, s []byte) {
-		sort.MergeFunc(s, cmp.Compare)
-
-		if !slices.IsSortedFunc(s, cmp.Compare) {
-			t.Errorf("slice was not sorted")
-		}
-	})
-}
-
-func FuzzMergeBottomUpSortFunc(f *testing.F) {
-	f.Fuzz(func(t *testing.T, s []byte) {
-		sort.MergeBottomUpFunc(s, cmp.Compare)
-
-		if !slices.IsSortedFunc(s, cmp.Compare) {
-			t.Errorf("slice was not sorted")
-		}
-	})
-}
-
-func reverse[T cmp.Ordered](fn func(x, y T) int) func(x, y T) int {
+func reverse[T any](fn func(x, y T) int) func(x, y T) int {
 	return func(x, y T) int { return fn(y, x) }
 }
